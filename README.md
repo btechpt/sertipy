@@ -38,33 +38,33 @@ authorization. For details on the capabilities check [Sertiva Web API](https://a
 
 ```python
 # to get list designs
-Sertiva.designs.list()
+sertiva.designs.list()
 
 # to get detail design
-Sertiva.designs.detail('<design_id>')
+sertiva.designs.detail('<design_id>')
 ```
 
 ### Templates
 
 ```python
 # to get list templates
-Sertiva.templates.list()
+sertiva.templates.list()
 
 # to get detail template
-Sertiva.templates.detail('<template_id>')
+sertiva.templates.detail('<template_id>')
 
 # create new template
-Sertiva.templates.create('<design_id>', '<title>', '<description>')
+sertiva.templates.create('<design_id>', '<title>', '<description>')
 
 # update template
-Sertiva.templates.update('<template_id>', '<title>', '<description>')
+sertiva.templates.update('<template_id>', '<title>', '<description>')
 ```
 
 ### Recipients
 
 ```python
 # to get list draft recipients
-Sertiva.recipients.list('<template_id>')
+sertiva.recipients.list('<template_id>')
 
 # create new draft recipient
 data_create = [
@@ -79,7 +79,7 @@ data_create = [
     },
 ]
 
-Sertiva.recipients.create('<template_id>', data_create)
+sertiva.recipients.create('<template_id>', data_create)
 
 # update draft recipient
 data_update = [
@@ -94,22 +94,22 @@ data_update = [
     },
 ]
 
-Sertiva.recipients.update('<template_id>', data_update)
+sertiva.recipients.update('<template_id>', data_update)
 
 # delete recipient
 data_delete = ['72150eae-b469-4fbf-9b02-226075a9cf10']
 
-Sertiva.recipients.delete('<template_id>', data_delete)
+sertiva.recipients.delete('<template_id>', data_delete)
 ```
 
 ### Credentials
 
 ```python
 # get list all credentials
-Sertiva.credentials.list()
+sertiva.credentials.list()
 
 # get detail some credential
-Sertiva.credentials.detail('<credential_id>')
+sertiva.credentials.detail('<credential_id>')
 ```
 
 ### Main
@@ -118,12 +118,12 @@ Sertiva.credentials.detail('<credential_id>')
 
 ```python
 # with all data in draft
-Sertiva.mains.issue('<template_id>', '<issuance_date>', '<expiration_date>')
+sertiva.mains.issue('<template_id>', '<issuance_date>', '<expiration_date>')
 
 # with recipient ids
 recipient_ids = ['6ad5c6e0-9ac7-488b-b05f-d8b32b73b4cf']
 
-Sertiva.mains.issue('<template_id>', '<issuance_date>', '<expiration_date>', recipient_ids)
+sertiva.mains.issue('<template_id>', '<issuance_date>', '<expiration_date>', recipient_ids)
 ```
 
 #### Issue Using data recipients directly (without make draft recipient)
@@ -140,7 +140,7 @@ recipients = [{
         }
     }
 },]
-Sertiva.mains.issue('<template_id>', '<issuance_date>', '<expiration_date>', recipients)
+sertiva.mains.issue('<template_id>', '<issuance_date>', '<expiration_date>', recipients)
 ```
 - for data `id` you can make with `uuid`
 
@@ -150,13 +150,13 @@ Sertiva.mains.issue('<template_id>', '<issuance_date>', '<expiration_date>', rec
 # verify credential
 data_to_verify = ['72150eae-b469-4fbf-9b02-226075a9cf10']
 
-Sertiva.mains.verify(data_to_verify)
+sertiva.mains.verify(data_to_verify)
 
 # revoke credential
 data_to_revoke = ['72150eae-b469-4fbf-9b02-226075a9cf10']
 reason = 'wrong certificate'
 
-Sertiva.mains.revoke(data_to_revoke, reason)
+sertiva.mains.revoke(data_to_revoke, reason)
 ```
 
 ## Reporting Issues
