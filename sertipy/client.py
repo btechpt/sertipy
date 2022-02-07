@@ -19,7 +19,7 @@ class SertivaBaseRequest:
     def _auth_headers(self) -> Dict[str, str]:
         return {"Authorization": "Bearer {0}".format(self.auth.get_token())}
 
-    def _internal_call(self, method: str, url: str, payload=None, number_of_page: int = 1) -> Dict[str, any]:
+    def _internal_call(self, method: str, url: str, payload=None, number_of_page=None) -> Dict[str, any]:
         allowed_methods = {
             'GET': requests.get,
             'POST': requests.post,
@@ -28,8 +28,12 @@ class SertivaBaseRequest:
         }
 
         try:
-            response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(),
-                                               params={'page': number_of_page}, json=payload)
+            if number_of_page:
+                response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(),
+                                                   params={'page': number_of_page}, json=payload)
+            else:
+                response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(), json=payload)
+
             response.raise_for_status()
             results = response.json()
 
