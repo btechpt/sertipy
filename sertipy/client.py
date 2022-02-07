@@ -19,7 +19,7 @@ class SertivaBaseRequest:
     def _auth_headers(self) -> Dict[str, str]:
         return {"Authorization": "Bearer {0}".format(self.auth.get_token())}
 
-    def _internal_call(self, method: str, url: str, payload=None) -> Dict[str, any]:
+    def _internal_call(self, method: str, url: str, payload=None, params=None) -> Dict[str, any]:
         allowed_methods = {
             'GET': requests.get,
             'POST': requests.post,
@@ -28,9 +28,15 @@ class SertivaBaseRequest:
         }
 
         try:
-            response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(), json=payload)
+            if params:
+                response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(),
+                                                   params=params, json=payload)
+            else:
+                response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(), json=payload)
+
             response.raise_for_status()
             results = response.json()
+
         except requests.exceptions.HTTPError as http_error:
             response = http_error.response
             logger.error(f'[SERTIPY] Failed to request {url}')
@@ -38,7 +44,7 @@ class SertivaBaseRequest:
             raise SertipyException(
                 response.status_code,
                 "%s:\n %s" % (response.url, response.json()['message']),
-                reason=response.reason,)
+                reason=response.reason, )
 
         logger.info('[SERTIPY] Success to request internal API Sertiva')
 
@@ -46,10 +52,10 @@ class SertivaBaseRequest:
 
 
 class SertivaDesign(SertivaBaseRequest):
-    def list(self):
+    def list(self, number_of_page: int = 1):
         """ To get list design certificate"""
         logger.debug('[SERTIPY] Sending GET request list designs to Sertiva')
-        return self._internal_call('GET', 'designs')
+        return self._internal_call('GET', 'designs', {"page": number_of_page})
 
     def detail(self, design_id: str):
         """ To get detail design certificate
@@ -60,10 +66,10 @@ class SertivaDesign(SertivaBaseRequest):
 
 
 class SertivaTemplate(SertivaBaseRequest):
-    def list(self):
+    def list(self, number_of_page: int = 1):
         """ To get list templates"""
         logger.debug('[SERTIPY] Sending GET request list templates to Sertiva')
-        return self._internal_call('GET', 'templates')
+        return self._internal_call('GET', 'templates', {"page": number_of_page})
 
     def detail(self, template_id: str):
         """ To get detail template certificate
@@ -101,10 +107,10 @@ class SertivaTemplate(SertivaBaseRequest):
 
 
 class SertivaRecipient(SertivaBaseRequest):
-    def list(self, template_id: str):
+    def list(self, template_id: str, number_of_page: int = 1):
         """ To get list recipients"""
         logger.debug('[SERTIPY] Sending GET request List Draft Recipient to Sertiva')
-        return self._internal_call('GET', f'templates/{template_id}/recipients')
+        return self._internal_call('GET', f'templates/{template_id}/recipients', {"page": number_of_page})
 
     def create(self, template_id: str, recipient_data: List[dict]):
         """ To get create new draft recipients
@@ -141,10 +147,10 @@ class SertivaRecipient(SertivaBaseRequest):
 
 
 class SertivaCredential(SertivaBaseRequest):
-    def list(self):
+    def list(self, number_of_page: int = 1):
         """ To get list credentials"""
         logger.debug('[SERTIPY] Sending GET request list credentials to Sertiva')
-        return self._internal_call('GET', 'credentials')
+        return self._internal_call('GET', 'credentials', {"page": number_of_page})
 
     def detail(self, credential_id: str):
         """ To get detail credential
