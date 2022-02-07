@@ -48,8 +48,6 @@ class SertivaBaseRequest:
 
         logger.info('[SERTIPY] Success to request internal API Sertiva')
 
-        print(results)
-
         return results
 
 
