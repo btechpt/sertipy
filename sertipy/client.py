@@ -19,19 +19,18 @@ class SertivaBaseRequest:
     def _auth_headers(self) -> Dict[str, str]:
         return {"Authorization": "Bearer {0}".format(self.auth.get_token())}
 
-    def _internal_call(self, method: str, url: str, **kwargs) -> Dict[str, any]:
+    def _internal_call(self, method: str, url: str, payload=None, params=None) -> Dict[str, any]:
         allowed_methods = {
             'GET': requests.get,
             'POST': requests.post,
             'PATCH': requests.patch,
             'DELETE': requests.delete
         }
-        payload = kwargs.get("payload", None)
 
         try:
-            if kwargs.get("number_of_page", None):
+            if params:
                 response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(),
-                                                   params={'page': str(kwargs.get("number_of_page", None))}, json=payload)
+                                                   params=params, json=payload)
             else:
                 response = allowed_methods[method](self.prefix + url, headers=self._auth_headers(), json=payload)
 
@@ -49,6 +48,8 @@ class SertivaBaseRequest:
 
         logger.info('[SERTIPY] Success to request internal API Sertiva')
 
+        print(results)
+
         return results
 
 
@@ -56,7 +57,7 @@ class SertivaDesign(SertivaBaseRequest):
     def list(self, number_of_page: int = 1):
         """ To get list design certificate"""
         logger.debug('[SERTIPY] Sending GET request list designs to Sertiva')
-        return self._internal_call('GET', 'designs', **{"number_of_page": number_of_page})
+        return self._internal_call('GET', 'designs', {"page": number_of_page})
 
     def detail(self, design_id: str):
         """ To get detail design certificate
@@ -70,7 +71,7 @@ class SertivaTemplate(SertivaBaseRequest):
     def list(self, number_of_page: int = 1):
         """ To get list templates"""
         logger.debug('[SERTIPY] Sending GET request list templates to Sertiva')
-        return self._internal_call('GET', 'templates', **{"number_of_page": number_of_page})
+        return self._internal_call('GET', 'templates', {"page": number_of_page})
 
     def detail(self, template_id: str):
         """ To get detail template certificate
@@ -91,7 +92,7 @@ class SertivaTemplate(SertivaBaseRequest):
             "description": description
         }
         logger.debug('[SERTIPY] Sending POST request create template to Sertiva')
-        return self._internal_call('POST', 'templates', **{"payload": payload})
+        return self._internal_call('POST', 'templates', payload)
 
     def update(self, template_id: str, title: str, description: str):
         """ To edit templates
@@ -104,14 +105,14 @@ class SertivaTemplate(SertivaBaseRequest):
             "description": description
         }
         logger.debug('[SERTIPY] Sending PATCH request update template to Sertiva')
-        return self._internal_call('PATCH', f'templates/{template_id}', **{"payload": payload})
+        return self._internal_call('PATCH', f'templates/{template_id}', payload)
 
 
 class SertivaRecipient(SertivaBaseRequest):
     def list(self, template_id: str, number_of_page: int = 1):
         """ To get list recipients"""
         logger.debug('[SERTIPY] Sending GET request List Draft Recipient to Sertiva')
-        return self._internal_call('GET', f'templates/{template_id}/recipients', **{"number_of_page": number_of_page})
+        return self._internal_call('GET', f'templates/{template_id}/recipients', {"page": number_of_page})
 
     def create(self, template_id: str, recipient_data: List[dict]):
         """ To get create new draft recipients
@@ -122,7 +123,7 @@ class SertivaRecipient(SertivaBaseRequest):
             'recipients': recipient_data
         }
         logger.debug('[SERTIPY] Sending POST request Create Draft Recipient to Sertiva')
-        return self._internal_call('POST', f'templates/{template_id}/recipients', **{"payload": payload})
+        return self._internal_call('POST', f'templates/{template_id}/recipients', payload)
 
     def update(self, template_id: str, recipient_data: List[dict]):
         """ To update recipients
@@ -133,7 +134,7 @@ class SertivaRecipient(SertivaBaseRequest):
             'recipients': recipient_data
         }
         logger.debug('[SERTIPY] Sending PATCH request Update Draft Recipient to Sertiva')
-        return self._internal_call('PATCH', f'templates/{template_id}/recipients', **{"payload": payload})
+        return self._internal_call('PATCH', f'templates/{template_id}/recipients', payload)
 
     def delete(self, template_id: str, recipient_ids: List[str]):
         """ To delete recipients
@@ -144,14 +145,14 @@ class SertivaRecipient(SertivaBaseRequest):
             'recipient_ids': recipient_ids
         }
         logger.debug('[SERTIPY] Sending DELETE request Delete Draft Recipient to Sertiva')
-        return self._internal_call('DELETE', f'templates/{template_id}/recipients', **{"payload": payload})
+        return self._internal_call('DELETE', f'templates/{template_id}/recipients', payload)
 
 
 class SertivaCredential(SertivaBaseRequest):
     def list(self, number_of_page: int = 1):
         """ To get list credentials"""
         logger.debug('[SERTIPY] Sending GET request list credentials to Sertiva')
-        return self._internal_call('GET', 'credentials', **{"number_of_page": number_of_page})
+        return self._internal_call('GET', 'credentials', {"page": number_of_page})
 
     def detail(self, credential_id: str):
         """ To get detail credential
@@ -184,17 +185,17 @@ class SertivaMain(SertivaBaseRequest):
             payload['recipient_ids'] = recipient_ids
             logger.debug('[SERTIPY] Sending POST request issue new credential to Sertiva '
                          'with ids recipient')
-            return self._internal_call('POST', 'issue', **{"payload": payload})
+            return self._internal_call('POST', 'issue', payload)
 
         if recipients:
             payload['recipients'] = recipients
             logger.debug('[SERTIPY] Sending POST request issue new credential to Sertiva '
                          'with directly data recipients')
-            return self._internal_call('POST', 'issue', **{"payload": payload})
+            return self._internal_call('POST', 'issue', payload)
 
         logger.debug('[SERTIPY] Sending POST request issue new credential to Sertiva '
                      'with all draft recipients in the template')
-        return self._internal_call('POST', 'issue', **{"payload": payload})
+        return self._internal_call('POST', 'issue', payload)
 
     def verify(self, credential_ids: List[str]):
         """ To verify validation credential/certificate
@@ -204,7 +205,7 @@ class SertivaMain(SertivaBaseRequest):
             "credential_ids": credential_ids
         }
         logger.debug('[SERTIPY] Sending POST request verify validation credential to Sertiva')
-        return self._internal_call('POST', 'verify', **{"payload": payload})
+        return self._internal_call('POST', 'verify', payload)
 
     def revoke(self, credential_ids: List[str], reason: str):
         """ To revoke credential/certificate
@@ -216,7 +217,7 @@ class SertivaMain(SertivaBaseRequest):
             'credential_ids': credential_ids
         }
         logger.debug('[SERTIPY] Sending DELETE request revoke credential to Sertiva')
-        return self._internal_call('DELETE', 'revoke', **{"payload": payload})
+        return self._internal_call('DELETE', 'revoke', payload)
 
 
 class Sertiva:
