@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="sertipy",  # Replace with your own username
-    version="1.0.0",
+    version="1.1.0",
     author="Boer Technology",
     author_email="dev@btech.id",
     description="Python library for the Sertiva Web API",
