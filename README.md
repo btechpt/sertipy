@@ -1,6 +1,10 @@
-# Sertipy
+<h1 align="center">
+<img src="assets/image/logo_sertipy.svg" width="300">
+</h1><br>
 
-##### Python library for the Sertiva Web API
+
+### **Sertipy** is Python library for the Sertiva Web API
+<br>
 
 ## Instalation
 
